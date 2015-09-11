@@ -1,0 +1,85 @@
+#!/bin/sh
+#
+# Copyright (C) 2015 Red Hat Inc.
+# Author: Salim Badakhchani <sal@redhat.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+########################################################################
+
+# Uncomment to debug script
+#set -x
+
+# Check user priviledges
+if [ "$USER" != "root" ]; then
+    echo -e "\n# This script requires root priviledges to run"
+exit
+fi
+
+# Install Nexus
+yum install patch
+wget http://www.sonatype.org/downloads/nexus-latest-bundle.tar.gz
+mkdir /var/opt/sonatype /var/run/nexus/
+tar zxfv nexus-latest-bundle.tar.gz -C /var/opt/sonatype
+mv /var/opt/sonatype/nexus-*/ /var/opt/sonatype/nexus
+useradd nexus -d /var/opt/sonatype/nexus/
+chown -R nexus:nexus /var/opt/sonatype /var/run/nexus/
+cp /var/opt/sonatype/nexus/bin/nexus /etc/init.d/
+chkconfig nexus on
+
+# Apply configuration patch 
+cp -p /etc/init.d/nexus /etc/init.d/nexus.orig
+cat > /tmp/nexus.patch << 'EOF'
+
+--- /etc/init.d/nexus   2015-05-19 23:17:30.000000000 +0200
++++ /etc/init.d/nexus   2015-06-15 16:16:18.867999970 +0200
+@@ -11,7 +11,7 @@
+ # These settings can be modified to fit the needs of your application
+ 
+ # Set this to the root of the Nexus installation
+-NEXUS_HOME=".."
++NEXUS_HOME="/var/opt/sonatype/nexus"
+ 
+ # If specified, the Wrapper will be run as the specified user.
+ 
+@@ -20,7 +20,7 @@
+ # NOTE - This will set the user which is used to run the Wrapper as well as
+ #  the JVM and is not useful in situations where a privileged resource or
+ #  port needs to be allocated prior to the user being changed.
+-#RUN_AS_USER=
++RUN_AS_USER=nexus
+ 
+ # Application
+ APP_NAME="nexus"
+@@ -31,7 +31,7 @@
+ PRIORITY=
+ 
+ # Location of the pid file.
+-#PIDDIR="."
++PIDDIR="/var/run/nexus"
+ 
+ # If uncommented, causes the Wrapper to be shutdown using an anchor file.
+ #  When launched with the 'start' command, it will also ignore all INT and
+@@ -549,4 +549,4 @@
+         ;;
+ esac
+ 
+-exit 0
+\ No newline at end of file
++exit 0
+EOF
+patch -p0 < /tmp/nexus.patch
+rm -f /tmp/jenkins.patch
+
+service nexus start

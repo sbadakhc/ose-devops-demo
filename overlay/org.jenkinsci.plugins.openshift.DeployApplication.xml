@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<org.jenkinsci.plugins.openshift.DeployApplication_-DeployApplicationDescriptor plugin="openshift-deployer@1.2.0">
+  <DEFAULT__PUBLICKEY__PATH>/var/lib/jenkins/.ssh/id_rsa.pub</DEFAULT__PUBLICKEY__PATH>
+  <servers>
+    <org.jenkinsci.plugins.openshift.Server>
+      <name>OSE DEMO</name>
+      <brokerAddress>broker.example.com</brokerAddress>
+      <username>demo</username>
+      <password>Lc9/jSxnwb+rNirzLfALkZwgGyHxNLo3ciayKG3R8Dv2ZNA0PWcxQHGoEticV17A</password>
+      <secret>Lc9/jSxnwb+rNirzLfALkZwgGyHxNLo3ciayKG3R8Dv2ZNA0PWcxQHGoEticV17A</secret>
+    </org.jenkinsci.plugins.openshift.Server>
+  </servers>
+  <publicKeyPath>/var/lib/jenkins/.ssh/id_rsa.pub</publicKeyPath>
+</org.jenkinsci.plugins.openshift.DeployApplication_-DeployApplicationDescriptor>
