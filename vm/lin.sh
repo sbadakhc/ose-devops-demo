@@ -27,23 +27,22 @@ if [ "$USER" != "root" ]; then
 exit
 fi
 
-VM_HOME="${HOME}/workspace/ose-devops-vm"
+VM_HOME="${HOME}/workspace/vm"
 
-echo -e "# Checking for VirtualBox and Vagrant packages"
+echo -e "# Installing VirtualBox"
 [[ ! "$(rpm -qa | grep vagrant)" ]] && yum -y install https://dl.bintray.com/mitchellh/vagrant/vagrant_1.6.5_x86_64.rpm
+
 if [ ! $(which VBoxManage) ]
 then
     [[ ! -f /etc/yum.repos.d/virtualbox.repo ]] && wget -P /etc/yum.repos.d/ http://download.virtualbox.org/virtualbox/rpm/$OS/virtualbox.repo
     yum -y install VirtualBox kmod-VirtualBox
 fi
 
-
-echo -e "# Installing vm in ${VM_HOME}"
 [[ -d ${VM_HOME} ]] && rm -rf ${VM_HOME}
 mkdir -p ${VM_HOME}
 cd ${VM_HOME}
 
-echo -e "# Initialising virtual machine"
+echo -e "# Run vagrant"
 vagrant box add base https://github.com/tommy-muehle/vagrant-box-centos-6.6/releases/download/1.0.0/centos-6.6-x86_64.box
 vagrant init
 vagrant up

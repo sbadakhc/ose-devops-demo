@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+# Copyright (C) 2015 Red Hat Inc.
+# Author: Salim Badakhchani <sal@redhat.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+########################################################################
+
+# Uncomment to debug script
+#set -x
+
+# Check user priviledges
+if [ "$USER" != "root" ]; then
+    echo -e "\n# This script requires root priviledges to run"
+exit
+fi
+
+echo -e "# Installing packages"
+rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm
+yum install -y puppet ruby patch bind
+
+if [ ! -f "~/.openshift/oo-install-cfg.yml" ]; then
+  mkdir ~/.openshift
+  cp ~/workspace/ose-devops-demo/openshift/oo-install-cfg.yml ~/.openshift
+fi
+
+echo -e "# Installing Openshift"
+echo -e "1\n3\nn\nn" > /tmp/response.txt
+sh <(curl -s https://install.openshift.com/origin-m4) < /tmp/response.txt
+
+echo -e "# Installing rhc tools"
+gem install --no-rdoc rhc
+echo -e "\n\ny\ndemo\nopenshift\ny\ny\n" > /tmp/response.txt
+rhc setup < /tmp/response.txt
+rm -f /tmp/response.txt
+
+echo -e "# Configuring domains for development, testing and production"
+rhc domain create -n development
+rhc domain create -n testing
+rhc domain create -n production
+
+echo -e "# Install packages required for demo and activate cartridges"
+yum -y install https://s3-us-west-2.amazonaws.com/getup-mirror/getup-openshift-origin-release-4/dependencies/tomcat6-6.0.39-1.noarch.rpm \
+https://s3-us-west-2.amazonaws.com/getup-mirror/getup-openshift-origin-release-4/dependencies/tomcat7-7.0.50-1.noarch.rpm \
+https://s3-us-west-2.amazonaws.com/getup-mirror/getup-openshift-origin-release-4/dependencies/maven3-3.0.3-4.noarch.rpm \
+https://s3-us-west-2.amazonaws.com/getup-mirror/getup-openshift-origin-release-4/dependencies/jboss-as7-modules-7.1.1.Final-1.noarch.rpm \
+https://s3-us-west-2.amazonaws.com/getup-mirror/getup-openshift-origin-release-4/dependencies/jboss-as7-7.1.1.Final-1.noarch.rpm \
+openshift-origin-cartridge-jbossas \
+openshift-origin-cartridge-jbossews
+
+echo -e "# Restarting cloud services" 
+service ruby193-mcollective restart
+
+echo -e "# Activating catridges"
+oo-admin-ctl-cartridge -c import-node --activate
+
+echo -e "# Switching firewall off"
+chkconfig iptables off
+service iptables stop

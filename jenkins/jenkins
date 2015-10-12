@@ -1,0 +1,118 @@
+#!/bin/sh
+#
+# Copyright (C) 2015 Red Hat Inc.
+# Author: Salim Badakhchani <sal@redhat.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+########################################################################
+
+# Uncomment to debug script
+#set -x
+
+# Check user priviledges
+if [ "$USER" != "root" ]; then
+    echo -e "\n# This script requires root priviledges to run"
+exit
+fi
+
+echo -e "# Installing packages"
+yum -y install java mailx wget links
+wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
+yum install -y jenkins
+
+echo -e "# Backup vanilla Jenkins installations"
+cp -af /var/lib/jenkins /var/lib/jenkins.orig
+
+echo -e "# Patching Jenkins config"
+cp -p /etc/sysconfig/jenkins /etc/sysconfig/jenkins.orig
+cat > /tmp/jenkins.patch << 'EOF'
+*** /etc/sysconfig/jenkins	2015-09-07 03:01:20.000000000 -0400
+--- /etc/sysconfig/jenkins	2015-09-14 17:06:36.968997877 -0400
+***************
+*** 53,59 ****
+  # Port Jenkins is listening on.
+  # Set to -1 to disable
+  #
+! JENKINS_PORT="8080"
+  
+  ## Type:        string
+  ## Default:     ""
+--- 53,59 ----
+  # Port Jenkins is listening on.
+  # Set to -1 to disable
+  #
+! JENKINS_PORT="9080"
+  
+  ## Type:        string
+  ## Default:     ""
+EOF
+(cd / && patch -p0) < /tmp/jenkins.patch
+rm -f /tmp/jenkins.patch
+
+echo -e "# Setup Jave environment"
+JDK=$(rpm -qa | grep openjdk | sort -n | tail -1)
+alternatives --install /usr/bin/java java /usr/lib/jvm/${JDK}/bin/java 0
+
+echo -e "# Starting Jenkins server"
+service jenkins start
+chkconfig jenkins on
+
+echo -e "# Installing Maven"
+wget http://apache.arvixe.com/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz
+tar zxfv apache-maven-3.3.3-bin.tar.gz -C /usr/lib/
+alternatives --install /usr/bin/mvn mvn /usr/lib/apache-maven-3.3.3/bin/mvn 0
+
+echo -e "# Initialising plugin list..."
+while ! timeout 1 bash -c "echo > /dev/tcp/localhost/9080"; do echo -e "# Retrying...please be patient" && sleep 12 ; done
+curl http://localhost:9080 > /dev/null
+curl -L http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | \
+curl -X POST -H 'Accept: application/json' -d @- http://localhost:9080/updateCenter/byId/default/postBack
+
+if [ ! -f jenkins-cli.jar ]; then
+    echo -e "# Retrieve jenkins client"
+    wget http://localhost:9080/jnlpJars/jenkins-cli.jar
+else
+    echo -e "# Jenkins client already installed"
+fi
+
+PLUGINS="git \
+openshift-deployer \
+delivery-pipeline-plugin \
+promoted-builds \
+authorize-project \
+build-pipeline-plugin \
+conditional-buildstep \
+copyartifact \
+github-api \
+github \
+ssh-agent \
+matrix-project \
+role-strategy"
+
+java -jar jenkins-cli.jar -s http://localhost:9080 install-plugin ${PLUGINS}
+
+echo -e "# Configure Jenkins"
+alias cp='cp'
+cp -af ~/workspace/ose-devops-demo/jenkins/overlay/* /var/lib/jenkins
+if [[ -d "${HOME}/.ssh" ]] ; then rm -rf  ~/.ssh ; fi
+ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+cp -a /root/.ssh/ /var/lib/jenkins
+chown -R jenkins:jenkins /var/lib/jenkins
+./utils/remove-jobs
+rm -f apache-maven-* jenkins-cli.jar
+
+echo -e "# Restart Jenkins server"
+service jenkins restart

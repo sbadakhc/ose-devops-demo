@@ -10,8 +10,12 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+echo -e "# Removing old jobs"
 JENKINS_HOME="/var/lib/jenkins"
 cd ${JENKINS_HOME}/jobs
 find . -name "builds" -type d -exec rm -rf {} +
 find . -name "workspace" -type d -exec rm -rf {} +
 rm -rf ${JENKINS_HOME}/fingerprints/*
+
+echo -e "# Restarting Jenkins"
+service jenkins restart
