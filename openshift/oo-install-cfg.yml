@@ -45,7 +45,7 @@ Deployment:
       -----END RSA PRIVATE KEY-----
 
     mongodb_admin_password: 6uFRVzmeZH57YE1RkEJxNw
-    ip_addr: 192.168.122.3
+    ip_addr: 192.168.122.2
     roles: 
     - msgserver
     - dbserver
