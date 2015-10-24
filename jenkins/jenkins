@@ -55,9 +55,6 @@ curl http://localhost:8080 > /dev/null
 curl -L http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | \
 curl -X POST -H 'Accept: application/json' -d @- http://localhost:8080/updateCenter/byId/default/postBack
 
-echo -e "# Restart Jenkins server"
-service jenkins restart
-
 PLUGINS="git-client \
 openshift-deployer \
 delivery-pipeline-plugin \
