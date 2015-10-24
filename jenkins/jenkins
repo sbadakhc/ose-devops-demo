@@ -55,31 +55,31 @@ curl http://localhost:8080 > /dev/null
 curl -L http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | \
 curl -X POST -H 'Accept: application/json' -d @- http://localhost:8080/updateCenter/byId/default/postBack
 
-PLUGINS="git-client \
-openshift-deployer \
-delivery-pipeline-plugin \
-promoted-builds \
-authorize-project \
-build-pipeline-plugin \
-conditional-buildstep \
-copyartifact \
-github-api \
-github \
-ssh-agent \
-matrix-project \
-role-strategy"
+#PLUGINS="git-client \
+#openshift-deployer \
+#delivery-pipeline-plugin \
+#promoted-builds \
+#authorize-project \
+#build-pipeline-plugin \
+#conditional-buildstep \
+#copyartifact \
+#github-api \
+#github \
+#ssh-agent \
+#matrix-project \
+#role-strategy"
 
-java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 install-plugin ${PLUGINS}
+#java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 install-plugin ${PLUGINS}
 
-echo -e "# Configure Jenkins"
-alias cp='cp'
-cp -af ~/workspace/ose-devops-demo/jenkins/overlay/* /var/lib/jenkins
-if [[ -d "${HOME}/.ssh" ]] ; then rm -rf  ~/.ssh ; fi
-ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
-cp -a /root/.ssh/ /var/lib/jenkins
-chown -R jenkins:jenkins /var/lib/jenkins
-./utils/remove-jobs
-rm -f apache-maven-* jenkins-cli.jar
+#echo -e "# Configure Jenkins"
+#alias cp='cp'
+#cp -af ~/workspace/ose-devops-demo/jenkins/overlay/* /var/lib/jenkins
+#if [[ -d "${HOME}/.ssh" ]] ; then rm -rf  ~/.ssh ; fi
+#ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+#cp -a /root/.ssh/ /var/lib/jenkins
+#chown -R jenkins:jenkins /var/lib/jenkins
+#./utils/remove-jobs
+#rm -f apache-maven-* jenkins-cli.jar
 
 echo -e "# Restart Jenkins server"
 service jenkins restart
