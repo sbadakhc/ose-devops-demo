@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Copyright (C) 2015 Red Hat Inc.
 # Author: Salim Badakhchani <sal@redhat.com>
@@ -27,21 +27,22 @@ if [ "$USER" != "root" ]; then
 exit
 fi
 
-# Install Nexus
-yum install patch
+echo -e "# Installing Base packages"
+yum -y install java links mailx patch sos tree unzip wget
+
+echo -e "# Installing Nexus"
 wget http://www.sonatype.org/downloads/nexus-latest-bundle.tar.gz
 mkdir /var/opt/sonatype /var/run/nexus/
 tar zxfv nexus-latest-bundle.tar.gz -C /var/opt/sonatype
 mv /var/opt/sonatype/nexus-*/ /var/opt/sonatype/nexus
+cp ~/workspace/ose-devops-demo/nexus/nexus-client /var/opt/sonatype/nexus/bin/
 useradd nexus -d /var/opt/sonatype/nexus/
 chown -R nexus:nexus /var/opt/sonatype /var/run/nexus/
 cp /var/opt/sonatype/nexus/bin/nexus /etc/init.d/
 chkconfig nexus on
 
-# Apply configuration patch 
 cp -p /etc/init.d/nexus /etc/init.d/nexus.orig
 cat > /tmp/nexus.patch << 'EOF'
-
 --- /etc/init.d/nexus   2015-05-19 23:17:30.000000000 +0200
 +++ /etc/init.d/nexus   2015-06-15 16:16:18.867999970 +0200
 @@ -11,7 +11,7 @@
@@ -79,7 +80,10 @@ cat > /tmp/nexus.patch << 'EOF'
 \ No newline at end of file
 +exit 0
 EOF
-patch -p0 < /tmp/nexus.patch
+(cd / && patch -p0) < /tmp/nexus.patch
 rm -f /tmp/jenkins.patch
 
+rm -f ~/workspace/ose-devops-demo/nexus-latest-bundle.tar.gz
+
+echo -e "# Starting Nexus server"  
 service nexus start

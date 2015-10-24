@@ -1,0 +1,92 @@
+#!/bin/bash
+#
+# Copyright (C) 2015 Red Hat Inc.
+# Author: Salim Badakhchani <sal@redhat.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+########################################################################
+
+# Uncomment to debug script
+#set -x
+
+# Check user priviledges
+if [ "$USER" != "root" ]; then
+    echo -e "\n# This script requires root priviledges to run"
+exit
+fi
+
+echo -e "# Installing Base packages"
+yum -y install java links mailx patch sos tree unzip wget
+
+echo -e "# Install jenkins"
+wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
+yum install -y jenkins
+
+echo -e "# Backup vanilla Jenkins installations"
+cp -af /var/lib/jenkins /var/lib/jenkins.orig
+
+echo -e "# Setup Jave environment"
+JDK=$(rpm -qa | grep openjdk | sort -n | tail -1)
+alternatives --install /usr/bin/java java /usr/lib/jvm/${JDK}/bin/java 0
+
+echo -e "# Starting Jenkins server"
+service jenkins start
+chkconfig jenkins on
+
+echo -e "# Installing Maven"
+yum -y install maven
+
+echo -e "# Initialising Jenkins plugin list..."
+while ! timeout 1 bash -c "echo > /dev/tcp/localhost/8080"; do echo -e "# Retrying...please be patient" && sleep 12 ; done
+curl http://localhost:8080 > /dev/null
+curl -L http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | \
+curl -X POST -H 'Accept: application/json' -d @- http://localhost:8080/updateCenter/byId/default/postBack
+
+if [ ! -f jenkins-cli.jar ]; then
+    echo -e "# Retrieve jenkins client"
+    wget http://localhost:8080/jnlpJars/jenkins-cli.jar
+else
+    echo -e "# Jenkins client already installed"
+fi
+
+PLUGINS="git \
+openshift-deployer \
+delivery-pipeline-plugin \
+promoted-builds \
+authorize-project \
+build-pipeline-plugin \
+conditional-buildstep \
+copyartifact \
+github-api \
+github \
+ssh-agent \
+matrix-project \
+role-strategy"
+
+java -jar jenkins-cli.jar -s http://localhost:8080 install-plugin ${PLUGINS}
+
+echo -e "# Configure Jenkins"
+alias cp='cp'
+cp -af ~/workspace/ose-devops-demo/jenkins/overlay/* /var/lib/jenkins
+if [[ -d "${HOME}/.ssh" ]] ; then rm -rf  ~/.ssh ; fi
+ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+cp -a /root/.ssh/ /var/lib/jenkins
+chown -R jenkins:jenkins /var/lib/jenkins
+./utils/remove-jobs
+rm -f apache-maven-* jenkins-cli.jar
+
+echo -e "# Restart Jenkins server"
+service jenkins restart

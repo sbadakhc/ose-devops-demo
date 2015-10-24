@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Copyright (C) 2015 Red Hat Inc.
 # Author: Salim Badakhchani <sal@redhat.com>
@@ -18,6 +18,9 @@
 #
 ########################################################################
 
+# Uninstall
+# service gogs stop && userdel -rf git && rm -rf /var/spool/mail/git && rm /etc/init.d/gogs && mysqladmin drop gogs
+
 # Uncomment to debug script
 #set -x
 
@@ -27,23 +30,25 @@ if [ "$USER" != "root" ]; then
 exit
 fi
 
-VM_HOME="${HOME}/workspace/vm"
+echo -e "# Installing Git SCM"
+mkdir -p /home/git/gogs
+useradd -U -r -s /usr/bin/git-shell -d /home/git/ git
+[ -f "/tmp/gogs_v0.6.15_linux_amd64.zip" ] || wget -O /tmp/gogs_v0.6.15_linux_amd64.zip http://7d9nal.com2.z0.glb.qiniucdn.com/gogs_v0.6.15_linux_amd64.zip
+unzip /tmp/gogs_v0.6.15_linux_amd64.zip -d /home/git/
+mkdir /home/git/gogs/log
+touch /home/git/gogs/log/gogs.log
+ln -s /home/git/gogs/scripts/init/centos/gogs /etc/init.d/gogs
+chmod +x /home/git/gogs/scripts/init/centos/gogs
+chown -R git:git /home/git
+[ -f "/etc/shells.orig" ] || echo -e "/usr/bin/git-shell" >> /etc/shells
 
-echo -e "# Installing VirtualBox"
-[[ ! "$(rpm -qa | grep vagrant)" ]] && yum -y install https://dl.bintray.com/mitchellh/vagrant/vagrant_1.6.5_x86_64.rpm
+echo -e "# Starting mysql server"
+service mysqld start
+chkconfig mysqld on
 
-if [ ! $(which VBoxManage) ]
-then
-    [[ ! -f /etc/yum.repos.d/virtualbox.repo ]] && wget -P /etc/yum.repos.d/ http://download.virtualbox.org/virtualbox/rpm/$OS/virtualbox.repo
-    yum -y install VirtualBox kmod-VirtualBox
-fi
+echo -e "Creating database"
+mysqladmin create gogs
 
-[[ -d ${VM_HOME} ]] && rm -rf ${VM_HOME}
-mkdir -p ${VM_HOME}
-cd ${VM_HOME}
-
-echo -e "# Run vagrant"
-vagrant box add base https://github.com/tommy-muehle/vagrant-box-centos-6.6/releases/download/1.0.0/centos-6.6-x86_64.box
-vagrant init
-vagrant up
-vgrant ssh
+echo -e "# Starting gogs server"
+service gogs start
+chkconfig gogs on

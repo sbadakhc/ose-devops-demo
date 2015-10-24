@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<github-plugin-configuration plugin="github@1.13.3">
+  <configs>
+    <github-server-config>
+      <apiUrl>https://api.github.com</apiUrl>
+      <manageHooks>true</manageHooks>
+      <credentialsId>3736680f-51d3-45ad-b895-607c19e8319a</credentialsId>
+    </github-server-config>
+  </configs>
+</github-plugin-configuration>
