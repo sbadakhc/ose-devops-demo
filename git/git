@@ -42,7 +42,11 @@ chmod +x /home/git/gogs/scripts/init/centos/gogs
 chown -R git:git /home/git
 [ -f "/etc/shells.orig" ] || echo -e "/usr/bin/git-shell" >> /etc/shells
 
-echo -e "# Starting mysql server"
+echo -e "# Install MySql server"
+yum -y install  http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+yum -y install mysql-server
+
+echo -e "# Starting MySql server"
 service mysqld start
 chkconfig mysqld on
 
