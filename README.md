@@ -95,7 +95,7 @@ Known Issues
 
 1. When downloading the Jenkins plugins timeouts can occur causing an incomplete installation.  You will have to follow reinstall jenkins and re-run the installation script.
 ```
-[root@localhost]# service jenkins stop ; rm -rf /var/lib/jenkins* /var/log/jenkins/ /var/run/jenkins.pid /etc/sysconfig/jenkins* && yum -y reinstall jenkins ; service jenkens start
+[root@localhost]# service jenkins stop ; rm -rf /var/lib/jenkins* /var/log/jenkins/ /var/run/jenkins.pid /etc/sysconfig/jenkins* && yum -y reinstall jenkins ; service jenkins start
 [root@localhost]# ~/workspace/ose-devops-demo/jenkins/jenkins
 ```
 
