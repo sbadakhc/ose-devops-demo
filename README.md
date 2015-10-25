@@ -1,14 +1,14 @@
 Openshift DevOps Demo
 ========================
 
-A complete DevOps circuit with CI/CD and repository management intendid for educational and demonstrational purposes.  
+A complete DevOps circuit with CI/CD, SCM and repository management intendid for educational and demonstrational purposes.  
 
 ![GitHub Logo](/slides/05.png)
 
 Tool Chain
 ----------
 
-The current tool chanin includes Red Hat's Openshift Origin Platform As A Service (PAAS), Jenkins Continuous Integration, Nexus repository manager, Git source control management and Maven project manager.  Later versions with ship with testing suites like Sonar Cube and Selenium.  
+The current tool chani includes Red Hat's Openshift Origin Platform As A Service (PAAS), Jenkins Continuous Integration, Nexus repository manager, Git source control management and Maven project manager.  Later versions with ship with testing suites like Sonar Cube and Selenium.  
 
 Installation Prerequisites
 ---------------------------
@@ -45,7 +45,6 @@ yum -y update && yum -y install git && mkdir ~/workspace && cd ~/workspace && gi
 # Install DevOps Circuit
 yum -y update && yum -y install git && mkdir ~/workspace && cd ~/workspace && git clone https://github.com/sbadakhc/ose-devops-demo && cd ./ose-devops-demo && ./devops
 ```
-
 
 Minimum System Requirements
 --------------------------- 
