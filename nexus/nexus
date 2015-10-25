@@ -28,7 +28,7 @@ exit
 fi
 
 echo -e "# Installing Base packages"
-yum -y install java links mailx patch sos tree unzip wget
+yum -y install java links mailx mlocate patch sos tree unzip wget
 
 echo -e "# Installing Nexus"
 wget http://www.sonatype.org/downloads/nexus-latest-bundle.tar.gz

@@ -28,7 +28,7 @@ exit
 fi
 
 echo -e "# Installing Base packages"
-yum -y install java links mailx patch sos tree unzip wget
+yum -y install java links mailx mlocate patch sos tree unzip wget
 
 echo -e "# Installing packages"
 rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm
