@@ -51,3 +51,7 @@ yum -y install maven
 
 echo -e "# Restart Jenkins server"
 service jenkins restart
+
+echo -e "# Stopping firewall"
+service firewalld stop
+chkconfig firewalld off

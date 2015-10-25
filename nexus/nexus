@@ -87,3 +87,7 @@ rm -f ~/workspace/ose-devops-demo/nexus-latest-bundle.tar.gz
 
 echo -e "# Starting Nexus server"  
 service nexus start
+
+echo -e "# Stopping firewall"
+service firewalld stop
+chkconfig firewalld off

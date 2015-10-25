@@ -56,3 +56,7 @@ mysqladmin create gogs
 echo -e "# Starting gogs server"
 service gogs start
 chkconfig gogs on
+
+echo -e "# Stopping firewall"
+service firewalld stop
+chkconfig firewalld off
