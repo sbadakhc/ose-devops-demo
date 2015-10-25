@@ -17,7 +17,7 @@
       </strategy>
     </org.jenkinsci.plugins.authorizeproject.AuthorizeProjectProperty>
     <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.11.3">
-      <projectUrl>https://github.com/sbadakhc/HelloWorld.git/</projectUrl>
+      <projectUrl>https://devops.example.com:3000/devops/helloworld.git.git</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
     <se.diabol.jenkins.pipeline.PipelineProperty plugin="delivery-pipeline-plugin@0.9.4">
       <taskName>DEVELOPMENT</taskName>
@@ -33,7 +33,7 @@
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/sbadakhc/HelloWorld.git</url>
+        <url>https://devops.example.com:3000/devops/helloworld.git.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
