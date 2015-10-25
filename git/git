@@ -40,7 +40,7 @@ touch /home/git/gogs/log/gogs.log
 ln -s /home/git/gogs/scripts/init/centos/gogs /etc/init.d/gogs
 chmod +x /home/git/gogs/scripts/init/centos/gogs
 chown -R git:git /home/git
-[ -f "/etc/shells.orig" ] || echo -e "/usr/bin/git-shell" >> /etc/shells
+[ -f "/etc/shells.orig" ] || cp -p /etc/shells /etc/shells.orig && echo -e "/usr/bin/git-shell" >> /etc/shells
 
 echo -e "# Install MySql server"
 yum -y install  http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
