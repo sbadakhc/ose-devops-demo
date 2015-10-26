@@ -33,7 +33,7 @@ fi
 echo -e "# Installing Git SCM"
 mkdir -p /home/git/gogs
 useradd -U -r -s /usr/bin/git-shell -d /home/git/ git
-[ -f "/tmp/gogs_v0.6.15_linux_amd64.zip" ] || wget -O /tmp/gogs_v0.6.15_linux_amd64.zip http://7d9nal.com2.z0.glb.qiniucdn.com/gogs_v0.6.15_linux_amd64.zip
+[ ! -f "/tmp/gogs_v0.6.15_linux_amd64.zip" ] || wget -O /tmp/gogs_v0.6.15_linux_amd64.zip http://7d9nal.com2.z0.glb.qiniucdn.com/gogs_v0.6.15_linux_amd64.zip
 unzip /tmp/gogs_v0.6.15_linux_amd64.zip -d /home/git/
 mkdir /home/git/gogs/log
 touch /home/git/gogs/log/gogs.log
