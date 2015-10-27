@@ -81,7 +81,24 @@ cat > /tmp/nexus.patch << 'EOF'
 +exit 0
 EOF
 (cd / && patch -p0) < /tmp/nexus.patch
-rm -f /tmp/jenkins.patch
+rm -f /tmp/nexus.patch
+
+cp -p /var/opt/sonatype/nexus/bin/jsw/conf/wrapper.conf /var/opt/sonatype/nexus/bin/jsw/conf/wrapper.conf.orig
+cat > /tmp/wrapper.patch << 'EOF'
+--- /var/opt/sonatype/nexus/bin/jsw/conf/wrapper.conf   2015-10-27 17:34:49.964000000 -0400
++++ /var/opt/sonatype/nexus/bin/jsw/conf/wrapper.conf   2015-10-27 16:46:15.286000000 -0400
+@@ -51,7 +51,7 @@
+ # How much to wait for application to start up (increase on slower machines if needed)
+ wrapper.startup.timeout=0
+ # How much to wait for application to shutdown
+-wrapper.shutdown.timeout=300
++wrapper.shutdown.timeout=10
+ 
+ # Make wrapper reload configuration between app restarts
+ # and set exit code 12 as "RESTART" command
+EOF
+(cd / && patch -p0) < /tmp/wrapper.patch
+rm -f /tmp/wrapper.patch
 
 rm -f ~/workspace/ose-devops-demo/nexus-latest-bundle.tar.gz
 
