@@ -1,6 +1,6 @@
 HelloWorld
 ==========
 
-Simple HelloWorld web application used to test various plugins
+Simple HelloWorld web application used to test various plugins.
 
-Project scripts have been created for both Nexus and Artifactory.
+Project scripts have been created for both Nexus and Artifactory with Nexus used as the default.

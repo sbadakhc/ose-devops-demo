@@ -9,7 +9,8 @@ COMMITS=$(git log --pretty=format:'' | wc -l)
 
 git reset --soft HEAD~${COMMITS} && git commit -a -m "Re-initialised repo" && git push -f origin master
 git commit -a -m "Reinitialised repo"; git push origin master
-rm -rf pom.xml release.properties pom.xml.releaseBackup tmp target
+rm -rf release.properties pom.xml.releaseBackup tmp target
+cat pom.xml.nexus > pom.xml
 
 echo -e "# Removing artifacts from Nexus repository"
 curl -X DELETE -u admin:admin123 http://devops.example.com:9081/nexus/content/repositories/releases/com 2>&1 > /dev/null
