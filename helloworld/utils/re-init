@@ -18,7 +18,7 @@ curl -X DELETE -u admin:admin123 http://devops.example.com:9081/nexus/content/re
 #echo -e # Removing artifacts from Artifactory"
 #curl -v --user admin:admin --data-binary @local-file -X PUT "http:///devops.example.com:9081/artifactory/snapshots/"
 
-echo -e "# Restting index.jsp"
+echo -e "# Resetting index.jsp"
 cat > src/main/webapp/index.jsp << 'EOF'
 <html>
 <head>
