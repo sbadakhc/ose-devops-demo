@@ -32,7 +32,7 @@ yum -y install java links mailx mlocate patch sos tree unzip wget
 
 echo -e "# Installing Nexus"
 wget http://www.sonatype.org/downloads/nexus-latest-bundle.tar.gz
-mkdir /var/opt/sonatype /var/run/nexus
+mkdir /var/opt/sonatype 
 tar zxfv nexus-latest-bundle.tar.gz -C /var/opt/sonatype
 mv /var/opt/sonatype/nexus-*/ /var/opt/sonatype/nexus
 cp ~/workspace/ose-devops-demo/nexus/nexus-client /var/opt/sonatype/nexus/bin/
@@ -68,7 +68,7 @@ cat > /tmp/nexus.patch << 'EOF'
  
  # Location of the pid file.
 -#PIDDIR="."
-+PIDDIR="/var/run"
++PIDDIR="/var/tmp"
  
  # If uncommented, causes the Wrapper to be shutdown using an anchor file.
  #  When launched with the 'start' command, it will also ignore all INT and
