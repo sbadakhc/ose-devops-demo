@@ -32,7 +32,7 @@ yum -y install java links mailx mlocate patch sos tree unzip wget
 
 echo -e "# Installing Nexus"
 wget http://www.sonatype.org/downloads/nexus-latest-bundle.tar.gz
-mkdir /var/opt/sonatype /var/run/nexus/
+mkdir /var/opt/sonatype /var/run/nexus
 tar zxfv nexus-latest-bundle.tar.gz -C /var/opt/sonatype
 mv /var/opt/sonatype/nexus-*/ /var/opt/sonatype/nexus
 cp ~/workspace/ose-devops-demo/nexus/nexus-client /var/opt/sonatype/nexus/bin/
