@@ -265,7 +265,7 @@ cat > /tmp/kojid.conf.patch << 'EOF'
  
  ; The From address used when sending email notifications
 -from_addr=Koji Build System <buildsys@example.com>
-+from_addr=Koji Build System <buildsys@localdomain>
++from_addr=Koji Build System <buildsys@example.com>
  
  ;configuration for Kerberos authentication
  
@@ -298,7 +298,7 @@ cat > /tmp/hub.conf.patch << 'EOF'
  DBUser = koji
 -#DBHost = db.example.com
 -#DBPass = example_password
-+#DBHost = localhost.localdomain
++#DBHost = localhost.example.com
 +#DBPass = koji
  KojiDir = /mnt/koji
  
@@ -324,7 +324,7 @@ cat > /tmp/hub.conf.patch << 'EOF'
  ##  Other options  ##
  LoginCreatesUser = On
 -KojiWebURL = http://kojiweb.example.com/koji
-+KojiWebURL = http://kojiweb.localdomain/koji
++KojiWebURL = http://kojiweb.example.com/koji
  # The domain name that will be appended to Koji usernames
  # when creating email notifications
  #EmailDomain = example.com
@@ -588,7 +588,7 @@ CANAME="koji"
 
 # Get the systems host and domain name.
 HOSTNAME="koji"
-DOMAINNAME="localdomain"
+DOMAINNAME="example.com"
 
 # Certificate directories.
 CRTHOME="/etc/pki/koji"
@@ -651,10 +651,6 @@ echo -e "\nRestarting Services..."
 chkconfig postgresql on
 service httpd start
 chkconfig httpd on
-service jenkins start
-chkconfig jenkins on
-service artifactory start
-chkconfig artifactory on
 service kojid start
 chkconfig kojid on
 service kojira start
@@ -663,7 +659,7 @@ chkconfig kojira on
 echo -e "\nCreating base config..."
 export PROG="koji"
 export USER="koji"
-export HOST="kojibuilder1.localdomain"
+export HOST="kojibuilder1.example.com"
 export ARCH="x86_64"
 
 su -l ${USER} -c "
@@ -678,10 +674,10 @@ ${PROG} grant-permission repo kojira
 ${PROG} grant-permission build kojibuilder
 "
 echo -e "\nUpdating permissions..."
-echo -e "UPDATE host set user_id = '3' where name = 'kojibuilder1.localdomain';\
-UPDATE host set name = 'kojibuilder1' where name = 'kojibuilder1.localdomain';\
+echo -e "UPDATE host set user_id = '3' where name = 'kojibuilder1.example.com';\
+UPDATE host set name = 'kojibuilder1' where name = 'kojibuilder1.example.com';\
 UPDATE users set usertype = '1' where name = 'kojibuilder';\
-DELETE from users where name = 'kojibuilder1.localdomain';\q" >> /tmp/kojibuilder.sql
+DELETE from users where name = 'kojibuilder1.example.com';\q" >> /tmp/kojibuilder.sql
 su -l koji -c "psql koji koji < /tmp/kojibuilder.sql"
 rm /tmp/kojibuilder.sql
 
