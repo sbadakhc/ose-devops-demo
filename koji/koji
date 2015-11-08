@@ -688,38 +688,6 @@ rm /tmp/kojibuilder.sql
 echo -e "\nService Status..."
 service postgresql restart
 
-echo -e "# Initialising Jenkins plugin list..."
-curl -L http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | \
-curl -X POST -H 'Accept: application/json' -d @- http://localhost:8080/updateCenter/byId/default/postBack
-service jenkins restart
-while ! timeout 1 bash -c "echo > /dev/tcp/localhost/8080"; do echo -e "# Retrying...please be patient" && sleep 12 ; done
-if [ ! -f jenkins-cli.jar ]; then
-    echo -e "# Retrieve jenkins client"
-    wget http://localhost:8080/jnlpJars/jenkins-cli.jar
-else
-    echo -e "# Jenkins Client Already installed"
-fi
-
-PLUGINS="git \
-openshift-deployer \
-delivery-pipeline-plugin \
-promoted-builds \
-authorize-project \
-build-pipeline-plugin \
-conditional-buildstep \
-copyartifact \
-github-api \
-github \
-ssh-agent \
-matrix-project \
-koji \
-artifactory \
-repository-connector \
-role-strategy"
-
-echo -e "# Installing Jenkins client"
-java -jar jenkins-cli.jar -s http://localhost:8080 install-plugin ${PLUGINS}
-
 touch /tmp/install
 
 echo -e "\nInstallation complete...Kojak is AOK"
