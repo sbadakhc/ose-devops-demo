@@ -55,16 +55,16 @@ python-cheetah python-qpid \
 koji koji-builder koji-hub koji-hub-plugins koji-utils koji-vm koji-web
 
 echo -e "# 03. Creating Koji user directories" >> ${LOG}
-useradd koji
-echo koji | passwd koji --stdin
-mkdir /home/koji/workspace
-chown -R koji:koji /home/koji
-mkdir -p /home/koji/.koji
-chown koji:apache /home/koji/.koji
+useradd devops
+echo devops | passwd devops --stdin
+mkdir /home/devops/workspace
+chown -R devops:devops /home/devops
+mkdir -p /home/devops/.devops
+chown devops:apache /home/devops/.devops
 
 echo -e "# 04. Creating koji build directories" >> ${LOG}
-mkdir /mnt/koji
-cd /mnt/koji
+mkdir /mnt/devops
+cd /mnt/devops
 mkdir {packages,repos,work,scratch}
 chown apache:apache *
 cd -
@@ -324,7 +324,7 @@ cat > /tmp/hub.conf.patch << 'EOF'
  ##  Other options  ##
  LoginCreatesUser = On
 -KojiWebURL = http://kojiweb.example.com/koji
-+KojiWebURL = http://kojiweb.example.com/koji
++KojiWebURL = http://devops.example.com/koji
  # The domain name that will be appended to Koji usernames
  # when creating email notifications
  #EmailDomain = example.com
