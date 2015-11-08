@@ -9,6 +9,16 @@ DATE=$(date)
 POM="pom.xml"
 SETTINGS="./settings.xml"
 
+# Update the version of the file
+UPDATE=$(echo "<h3>Version Update ${DATE}</h3>")
+sed -e "/\<h1>/a \ ${UPDATE}" src/main/webapp/index.jsp > update.jsp
+cat update.jsp > src/main/webapp/index.jsp
+rm update.jsp
+
+# Commit the chnmage to our local git repo
+git commit -a -m "Version Update ${DATE}"
+
+
 # Prompt for release
 echo
 while true; do
