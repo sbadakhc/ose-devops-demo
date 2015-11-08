@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# Simple script to remove scm local and remote tags
+
+# Execute this script from the project root directory.
+
+TAGS=$(git tag); for tag in $TAGS; do git tag -d $tag && git push origin :refs/tags/$tag; done
+COMMITS=$(git log --pretty=format:'' | wc -l)
+
+git reset --soft HEAD~${COMMITS} && git commit -a -m "Re-initialised repo" && git push -f origin master
+git commit -a -m "Reinitialised repo"; git push origin master
+
+mvn -s ./setting.xml release:rollback
+
+echo -e "# Removing artifacts from Nexus repository"
+curl -X DELETE -u admin:admin123 http://devops.example.com:8081/nexus/content/repositories/releases/com 2>&1 > /dev/null
+
+echo -e "# Restting index.jsp"
+cat > src/main/webapp/index.jsp << 'EOF'
+<html>
+<head>
+<title>OSE DevOps Demp</title>
+</head>
+
+<body bgcolor=white>
+
+<table border="0" cellpadding="10">
+<tr>
+  <td align=center>
+  </td>
+  <td>
+     <h1>Hello World...We're continuously delivering</h1>
+  </td>
+</tr>
+</table>
+</body>
+</html> 
+EOF
